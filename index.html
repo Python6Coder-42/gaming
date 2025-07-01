@@ -2,148 +2,1186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mini Games Hub</title>
+    <title>Gaming Website</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background: #222; color: #fff; text-align: center; }
-        h1 { margin-top: 30px; }
-        .game-list { margin: 30px 0; }
-        button { margin: 10px; padding: 10px 20px; font-size: 16px; }
-        #game-area { margin-top: 30px; }
-        .hidden { display: none; }
-        .hangman-word { letter-spacing: 10px; font-size: 24px; }
-        .hangman-letters button { margin: 2px; }
+        body {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+        #menu {
+            text-align: center;
+            margin: 30px 0 20px 0;
+            background: rgba(255,255,255,0.04);
+            padding: 18px 0 10px 0;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 2px 12px #0002;
+        }
+        #menu button {
+            margin: 0 10px;
+            padding: 12px 32px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(90deg, #2196f3 0%, #21cbf3 100%);
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px #2196f355;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        #menu button:not(.active):hover {
+            background: linear-gradient(90deg, #21cbf3 0%, #2196f3 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        #menu button.active {
+            background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 16px #ff512f33;
+        }
+        #game-area {
+            margin: 0 auto;
+            width: 680px;
+            min-height: 720px;
+            background: rgba(255,255,255,0.13);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 #0004;
+            padding-bottom: 30px;
+            backdrop-filter: blur(4px);
+            border: 1.5px solid #fff2;
+        }
+        canvas {
+            background: #fff;
+            display: block;
+            margin: 0 auto;
+            border-radius: 12px;
+            border: 2px solid #2196f3;
+            box-shadow: 0 2px 16px #2196f344;
+        }
+        h2 {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 2px 8px #0006;
+            margin-top: 32px;
+        }
+        #paperio-score, #paperio-status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #fff;
+            text-shadow: 0 1px 4px #0004;
+        }
+        #paperio-status { font-size: 20px; color: #ff1744; }
+        table.standings {
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px #0002;
+        }
+        table.standings th, table.standings td {
+            border: none;
+            padding: 10px 18px;
+            font-size: 1.1em;
+        }
+        table.standings th {
+            background: #2196f3;
+            color: #fff;
+            font-weight: 700;
+        }
+        table.standings tr:nth-child(even) td {
+            background: #f7fafd;
+        }
+        #hangman-word {
+            font-size: 2.2em;
+            letter-spacing: 0.35em;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 2px 8px #0004;
+        }
+        #hangman-letters {
+            text-align: center;
+        }
+        #hangman-letters button {
+            margin: 2px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.1em;
+            border-radius: 6px;
+            border: none;
+            background: linear-gradient(90deg, #21cbf3 0%, #2196f3 100%);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 1px 4px #2196f344;
+            transition: background 0.2s;
+        }
+        #hangman-letters button:disabled {
+            background: #bdbdbd;
+            color: #fff;
+            cursor: not-allowed;
+        }
+        #hangman-status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 1px 4px #0004;
+        }
+        #rps-choices {
+            text-align: center;
+        }
+        #rps-choices button {
+            margin: 8px;
+            font-size: 1.2em;
+            width: 110px;
+            height: 44px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(90deg, #21cbf3 0%, #2196f3 100%);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 2px 8px #2196f344;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #rps-choices button:hover {
+            background: linear-gradient(90deg, #2196f3 0%, #21cbf3 100%);
+        }
+        #rps-result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 1px 4px #0004;
+        }
+        #connect4-board {
+            margin: 0 auto;
+            display: block;
+            border-radius: 12px;
+            border: 2px solid #2196f3;
+            box-shadow: 0 2px 16px #2196f344;
+        }
+        #connect4-status {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #fff;
+            text-shadow: 0 1px 4px #0004;
+        }
+        #connect4-restart {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 28px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(90deg, #2196f3 0%, #21cbf3 100%);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 2px 8px #2196f344;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #connect4-restart:hover {
+            background: linear-gradient(90deg, #21cbf3 0%, #2196f3 100%);
+        }
+        #home-area {
+            text-align: center;
+            padding-top: 100px;
+        }
+        #home-area h1 {
+            font-size: 2.7em;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 0 2px 12px #0008;
+            font-weight: 700;
+        }
+        #home-area button {
+            margin: 20px 20px;
+            padding: 22px 44px;
+            font-size: 1.3em;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(90deg, #2196f3 0%, #21cbf3 100%);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 2px 12px #2196f344;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        #home-area button:hover {
+            background: linear-gradient(90deg, #21cbf3 0%, #2196f3 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        #mini-crossword-board {
+            display: grid;
+            grid-template-columns: repeat(5, 44px);
+            grid-template-rows: repeat(5, 44px);
+            gap: 3px;
+            justify-content: center;
+            margin: 24px auto 12px auto;
+            background: #222;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px #0004;
+            width: max-content;
+        }
+        .mini-cell {
+            width: 44px;
+            height: 44px;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 1.5em;
+            text-align: center;
+            line-height: 44px;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-weight: 700;
+            color: #222;
+            outline: none;
+            border: 2px solid #2196f3;
+            box-sizing: border-box;
+            transition: border 0.2s;
+        }
+        .mini-cell:focus {
+            border: 2.5px solid #ff512f;
+        }
+        .mini-cell.black {
+            background: #222;
+            border: 2px solid #222;
+        }
+        .mini-num {
+            position: absolute;
+            font-size: 0.7em;
+            color: #2196f3;
+            left: 4px;
+            top: 2px;
+            font-weight: 700;
+        }
+        .mini-cell-wrap {
+            position: relative;
+        }
+        #mini-clues {
+            display: flex;
+            justify-content: space-around;
+            margin: 18px 0 0 0;
+            color: #fff;
+            font-size: 1.08em;
+        }
+        #mini-clues ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 18px;
+        }
+        #mini-clues li {
+            margin-bottom: 8px;
+        }
+        #mini-status {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 1.2em;
+            color: #fff;
+            text-shadow: 0 1px 4px #0004;
+        }
+        #mini-restart {
+            display: block;
+            margin: 18px auto 0 auto;
+            padding: 10px 28px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(90deg, #2196f3 0%, #21cbf3 100%);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 2px 8px #2196f344;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #mini-restart:hover {
+            background: linear-gradient(90deg, #21cbf3 0%, #2196f3 100%);
+        }
+        #back-home { display: none; }
+        #spaceinvaders-status {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #fff;
+            text-shadow: 0 1px 4px #0004;
+        }
     </style>
 </head>
 <body>
-    <h1>Mini Games Hub</h1>
-    <div class="game-list">
-        <button onclick="showGame('rps')">Rock Paper Scissors</button>
-        <button onclick="showGame('hangman')">Hangman</button>
-        <button onclick="showGame('paperio')">Paper.io (Demo)</button>
+    <div id="menu" style="display:none;">
+        <button id="btn-home" onclick="showHome()">Home</button>
+        <button id="btn-paperio" onclick="showGame('paperio')">Paper.io Demo</button>
+        <button id="btn-hangman" onclick="showGame('hangman')">Hangman</button>
+        <button id="btn-rps" onclick="showGame('rps')">Rock Paper Scissors</button>
+        <button id="btn-connect4" onclick="showGame('connect4')">4 in a Row</button>
+        <button id="btn-spaceinvaders" onclick="showGame('spaceinvaders')">Space Invaders</button>
+        <button id="btn-mini" onclick="showGame('mini')">Mini Crossword</button>
     </div>
     <div id="game-area"></div>
+<script>
+let currentGame = null;
 
-    <script>
-        function showGame(game) {
-            document.getElementById('game-area').innerHTML = '';
-            if (game === 'rps') rockPaperScissors();
-            if (game === 'hangman') hangman();
-            if (game === 'paperio') paperioDemo();
+function showHome() {
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('game-area').innerHTML = `
+        <div id="home-area">
+            <h1>Welcome to the Gaming Website!</h1>
+            <button onclick="showGame('paperio')">Play Paper.io Demo</button>
+            <button onclick="showGame('hangman')">Play Hangman</button>
+            <button onclick="showGame('rps')">Play Rock Paper Scissors</button>
+            <button onclick="showGame('connect4')">Play 4 in a Row</button>
+            <button onclick="showGame('spaceinvaders')">Play Space Invaders</button>
+            <button onclick="showGame('mini')">Play Mini Crossword</button>
+        </div>
+    `;
+    if (currentGame && currentGame.stop) currentGame.stop();
+}
+
+function showGame(game) {
+    document.getElementById('menu').style.display = '';
+    document.querySelectorAll('#menu button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('btn-' + game).classList.add('active');
+    document.getElementById('game-area').innerHTML = '';
+    if (currentGame && currentGame.stop) currentGame.stop();
+    if (game === 'paperio') paperioDemo();
+    if (game === 'hangman') hangmanGame();
+    if (game === 'rps') rpsGame();
+    if (game === 'connect4') connect4Game();
+    if (game === 'spaceinvaders') spaceInvadersGame();
+    if (game === 'mini') miniCrossword();
+}
+
+// --- Mini Crossword ---
+function miniCrossword() {
+    const grid = [
+        [{num:1, ans:'S'}, {ans:'H'}, {ans:'I'}, {ans:'N'}, {ans:'E'}],
+        [{num:2, ans:'A'}, {black:true}, {ans:'O'}, {black:true}, {ans:'E'}],
+        [{ans:'T'}, {ans:'E'}, {num:3, ans:'A'}, {ans:'S'}, {ans:'E'}],
+        [{ans:'E'}, {black:true}, {ans:'R'}, {black:true}, {ans:'E'}],
+        [{num:4, ans:'S'}, {ans:'E'}, {ans:'E'}, {ans:'D'}, {ans:'S'}]
+    ];
+    const clues = {
+        across: [
+            {num:1, clue:"Radiate light"},
+            {num:2, clue:"___-ha moment"},
+            {num:3, clue:"Flavor enhancer"},
+            {num:4, clue:"Planted, as a lawn"}
+        ],
+        down: [
+            {num:1, clue:"Opposite of lose"},
+            {num:2, clue:"Egg on"},
+            {num:3, clue:"Test"},
+            {num:4, clue:"Plural of 'sea'"}
+        ]
+    };
+    document.getElementById('game-area').innerHTML = `
+        <h2 style="text-align:center;">Mini Crossword</h2>
+        <div id="mini-crossword-board"></div>
+        <div id="mini-clues">
+            <div>
+                <b>Across</b>
+                <ul>${clues.across.map(c=>`<li><b>${c.num}.</b> ${c.clue}</li>`).join('')}</ul>
+            </div>
+            <div>
+                <b>Down</b>
+                <ul>${clues.down.map(c=>`<li><b>${c.num}.</b> ${c.clue}</li>`).join('')}</ul>
+            </div>
+        </div>
+        <div id="mini-status"></div>
+        <button id="mini-restart" onclick="miniCrossword()">Restart</button>
+    `;
+    const board = document.getElementById('mini-crossword-board');
+    board.innerHTML = '';
+    let cells = [];
+    for (let r=0; r<5; r++) for (let c=0; c<5; c++) {
+        let cell = grid[r][c];
+        let wrap = document.createElement('div');
+        wrap.className = 'mini-cell-wrap';
+        let input = document.createElement('input');
+        input.maxLength = 1;
+        input.autocomplete = "off";
+        input.spellcheck = false;
+        input.className = 'mini-cell' + (cell.black ? ' black' : '');
+        input.dataset.row = r;
+        input.dataset.col = c;
+        input.disabled = !!cell.black;
+        if (cell.black) input.value = '';
+        else input.value = '';
+        wrap.appendChild(input);
+        if (cell.num) {
+            let num = document.createElement('span');
+            num.className = 'mini-num';
+            num.textContent = cell.num;
+            wrap.appendChild(num);
         }
-
-        // Rock Paper Scissors
-        function rockPaperScissors() {
-            const area = document.getElementById('game-area');
-            area.innerHTML = `
-                <h2>Rock Paper Scissors</h2>
-                <div>
-                    <button onclick="rpsPlay('Rock')">Rock</button>
-                    <button onclick="rpsPlay('Paper')">Paper</button>
-                    <button onclick="rpsPlay('Scissors')">Scissors</button>
-                </div>
-                <div id="rps-result" style="margin-top:20px;font-size:18px;"></div>
-            `;
-            window.rpsPlay = function(player) {
-                const choices = ['Rock', 'Paper', 'Scissors'];
-                const ai = choices[Math.floor(Math.random() * 3)];
-                let result = '';
-                if (player === ai) result = "It's a draw!";
-                else if (
-                    (player === 'Rock' && ai === 'Scissors') ||
-                    (player === 'Paper' && ai === 'Rock') ||
-                    (player === 'Scissors' && ai === 'Paper')
-                ) result = 'You win!';
-                else result = 'You lose!';
-                document.getElementById('rps-result').innerText =
-                    `You: ${player} | AI: ${ai}\n${result}`;
+        board.appendChild(wrap);
+        cells.push(input);
+    }
+    cells.forEach(cell => {
+        cell.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z]/g,'');
+            if (this.value && !grid[this.dataset.row][this.dataset.col].black) {
+                let idx = cells.indexOf(this);
+                let next = idx+1;
+                while (next < cells.length && cells[next].disabled) next++;
+                if (next < cells.length) cells[next].focus();
+            }
+            checkMiniWin();
+        });
+        cell.addEventListener('keydown', function(e) {
+            let idx = cells.indexOf(this);
+            if (e.key === "Backspace" && !this.value) {
+                let prev = idx-1;
+                while (prev >= 0 && cells[prev].disabled) prev--;
+                if (prev >= 0) {
+                    cells[prev].focus();
+                }
+            }
+            if (e.key === "ArrowRight") {
+                let next = idx+1;
+                while (next < cells.length && cells[next].disabled) next++;
+                if (next < cells.length) cells[next].focus();
+                e.preventDefault();
+            }
+            if (e.key === "ArrowLeft") {
+                let prev = idx-1;
+                while (prev >= 0 && cells[prev].disabled) prev--;
+                if (prev >= 0) cells[prev].focus();
+                e.preventDefault();
+            }
+            if (e.key === "ArrowDown") {
+                let row = parseInt(this.dataset.row), col = parseInt(this.dataset.col);
+                let next = cells.findIndex(cell => parseInt(cell.dataset.row) === row+1 && parseInt(cell.dataset.col) === col);
+                while (next < cells.length && next >= 0 && cells[next].disabled) {
+                    row++;
+                    next = cells.findIndex(cell => parseInt(cell.dataset.row) === row && parseInt(cell.dataset.col) === col);
+                }
+                if (next >= 0 && next < cells.length) cells[next].focus();
+                e.preventDefault();
+            }
+            if (e.key === "ArrowUp") {
+                let row = parseInt(this.dataset.row), col = parseInt(this.dataset.col);
+                let prev = cells.findIndex(cell => parseInt(cell.dataset.row) === row-1 && parseInt(cell.dataset.col) === col);
+                while (prev >= 0 && cells[prev].disabled) {
+                    row--;
+                    prev = cells.findIndex(cell => parseInt(cell.dataset.row) === row && parseInt(cell.dataset.col) === col);
+                }
+                if (prev >= 0) cells[prev].focus();
+                e.preventDefault();
+            }
+        });
+    });
+    function checkMiniWin() {
+        let win = true;
+        for (let r=0; r<5; r++) for (let c=0; c<5; c++) {
+            let cell = grid[r][c];
+            if (!cell.black) {
+                let val = cells[r*5+c].value.toUpperCase();
+                if (val !== cell.ans) win = false;
             }
         }
-
-        // Hangman
-        function hangman() {
-            const words = ['javascript', 'hangman', 'computer', 'program', 'github'];
-            const word = words[Math.floor(Math.random() * words.length)];
-            let guessed = [];
-            let wrong = 0;
-            const maxWrong = 6;
-
-            function render() {
-                const area = document.getElementById('game-area');
-                let displayWord = word.split('').map(l => guessed.includes(l) ? l : '_').join(' ');
-                let letters = '';
-                for (let c = 97; c <= 122; c++) {
-                    const letter = String.fromCharCode(c);
-                    letters += `<button ${guessed.includes(letter) ? 'disabled' : ''} onclick="guess('${letter}')">${letter}</button>`;
-                }
-                area.innerHTML = `
-                    <h2>Hangman</h2>
-                    <div>Wrong guesses: ${wrong} / ${maxWrong}</div>
-                    <div class="hangman-word">${displayWord}</div>
-                    <div class="hangman-letters">${letters}</div>
-                    <div id="hangman-result" style="margin-top:20px;font-size:18px;"></div>
-                `;
-                if (!displayWord.includes('_')) {
-                    document.getElementById('hangman-result').innerText = 'You win!';
-                    disableAll();
-                } else if (wrong >= maxWrong) {
-                    document.getElementById('hangman-result').innerText = `You lose! Word was: ${word}`;
-                    disableAll();
-                }
-            }
-            window.guess = function(letter) {
-                if (!guessed.includes(letter)) {
-                    guessed.push(letter);
-                    if (!word.includes(letter)) wrong++;
-                }
-                render();
-            }
-            function disableAll() {
-                document.querySelectorAll('.hangman-letters button').forEach(btn => btn.disabled = true);
-            }
-            render();
+        if (win) {
+            document.getElementById('mini-status').textContent = "🎉 You solved the Mini Crossword!";
+        } else {
+            document.getElementById('mini-status').textContent = "";
         }
+    }
+    cells[0].focus();
+    currentGame = miniCrossword;
+    miniCrossword.stop = () => {};
+}
 
-        // Paper.io Demo (very simple)
-        function paperioDemo() {
-            const area = document.getElementById('game-area');
-            area.innerHTML = `
-                <h2>Paper.io (Demo)</h2>
-                <canvas id="paperio-canvas" width="300" height="300" style="background:#eee;border:1px solid #888;"></canvas>
-                <div>Use arrow keys to move. Fill as much area as you can!</div>
-                <div id="paperio-score" style="margin-top:10px;"></div>
-            `;
-            const canvas = document.getElementById('paperio-canvas');
-            const ctx = canvas.getContext('2d');
-            let grid = Array.from({length: 30}, () => Array(30).fill(0));
-            let x = 15, y = 15, score = 0;
-            grid[y][x] = 1;
-            draw();
-            document.onkeydown = function(e) {
-                let nx = x, ny = y;
-                if (e.key === 'ArrowUp') ny--;
-                if (e.key === 'ArrowDown') ny++;
-                if (e.key === 'ArrowLeft') nx--;
-                if (e.key === 'ArrowRight') nx++;
-                if (nx >= 0 && nx < 30 && ny >= 0 && ny < 30) {
-                    x = nx; y = ny;
-                    if (grid[y][x] === 0) score++;
-                    grid[y][x] = 1;
-                    draw();
+// --- Paper.io Demo ---
+function paperioDemo() {
+    document.getElementById('game-area').innerHTML = `
+        <h2 style="text-align:center;">Paper.io (Demo)</h2>
+        <canvas id="paperio-canvas" width="600" height="600"></canvas>
+        <div style="text-align:center;">Player 1: Arrow keys (Red). Player 2: WASD (Blue). Avoid AI and trails!</div>
+        <div id="paperio-score"></div>
+        <div id="paperio-status"></div>
+        <div id="paperio-standings"></div>
+    `;
+    const GRID_SIZE = 60;
+    const CELL_SIZE = 10;
+    const CANVAS_SIZE = GRID_SIZE * CELL_SIZE;
+    const canvas = document.getElementById('paperio-canvas');
+    const ctx = canvas.getContext('2d');
+    let grid = Array.from({length: GRID_SIZE}, () => Array(GRID_SIZE).fill(0));
+    let x1 = Math.floor(GRID_SIZE/2), y1 = Math.floor(GRID_SIZE/2), score1 = 0, alive1 = true;
+    let trail1 = [];
+    grid[y1][x1] = 1;
+    let x2 = Math.floor(GRID_SIZE/2)-5, y2 = Math.floor(GRID_SIZE/2)-5, score2 = 0, alive2 = true;
+    let trail2 = [];
+    grid[y2][x2] = 2;
+    let standings = [];
+    let finished = false;
+    const aiPlayers = [
+        {name: "AI Blue", x: 0, y: 0, color: '#2196f3', pattern: spiralPattern(0, 0, 'right', 'down', 'left', 'up'), step: 0, trail: [], alive: true, score: 0, deathOrder: null, fill: 3},
+        {name: "AI Orange", x: GRID_SIZE-1, y: GRID_SIZE-1, color: '#ff9800', pattern: spiralPattern(GRID_SIZE-1, GRID_SIZE-1, 'left', 'up', 'right', 'down'), step: 0, trail: [], alive: true, score: 0, deathOrder: null, fill: 4},
+        {name: "AI Green", x: 0, y: GRID_SIZE-1, color: '#8bc34a', pattern: spiralPattern(0, GRID_SIZE-1, 'up', 'right', 'down', 'left'), step: 0, trail: [], alive: true, score: 0, deathOrder: null, fill: 5},
+        {name: "AI Pink", x: GRID_SIZE-1, y: 0, color: '#e91e63', pattern: spiralPattern(GRID_SIZE-1, 0, 'down', 'left', 'up', 'right'), step: 0, trail: [], alive: true, score: 0, deathOrder: null, fill: 6},
+        {name: "AI Purple", x: Math.floor(GRID_SIZE/4), y: Math.floor(3*GRID_SIZE/4), color: '#9c27b0', pattern: boxSpiralPattern(Math.floor(GRID_SIZE/4), Math.floor(3*GRID_SIZE/4)), step: 0, trail: [], alive: true, score: 0, deathOrder: null, fill: 7}
+    ];
+    function spiralPattern(startX, startY, d0, d1, d2, d3) {
+        let moves = [];
+        let len = GRID_SIZE-1, dir = 0;
+        let dirs = [d0, d1, d2, d3];
+        for (let l = len; l > 0; l -= 2) {
+            for (let d = 0; d < 4; d++) {
+                for (let i = 0; i < l; i++) moves.push(dirs[(dir+d)%4]);
+            }
+            dir++;
+        }
+        return moves;
+    }
+    function boxSpiralPattern(startX, startY) {
+        let moves = [];
+        let len = Math.floor(GRID_SIZE/2), dir = 0;
+        let dirs = ['right', 'down', 'left', 'up'];
+        for (let l = 2; l < len; l += 2) {
+            for (let d = 0; d < 4; d++) {
+                for (let i = 0; i < l; i++) moves.push(dirs[(dir+d)%4]);
+            }
+            dir++;
+        }
+        for (let i = 0; i < 1000; i++) {
+            moves.push(i % 2 === 0 ? 'right' : 'up');
+        }
+        return moves;
+    }
+    function draw() {
+        ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+        for (let i=0;i<GRID_SIZE;i++) for (let j=0;j<GRID_SIZE;j++) {
+            if (grid[i][j] === 1) { ctx.fillStyle = '#4caf50'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+            if (grid[i][j] === 2) { ctx.fillStyle = '#90caf9'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+            if (grid[i][j] === 3) { ctx.fillStyle = '#bbdefb'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+            if (grid[i][j] === 4) { ctx.fillStyle = '#ffe0b2'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+            if (grid[i][j] === 5) { ctx.fillStyle = '#dcedc8'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+            if (grid[i][j] === 6) { ctx.fillStyle = '#f8bbd0'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+            if (grid[i][j] === 7) { ctx.fillStyle = '#e1bee7'; ctx.fillRect(j*CELL_SIZE,i*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+        }
+        ctx.fillStyle = '#a5d6a7';
+        for (const t of trail1) ctx.fillRect(t.x*CELL_SIZE, t.y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        ctx.fillStyle = '#b3e5fc';
+        for (const t of trail2) ctx.fillRect(t.x*CELL_SIZE, t.y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        aiPlayers.forEach(ai => {
+            if (!ai.alive) return;
+            ctx.fillStyle = ai.color + '88';
+            for (const t of ai.trail) ctx.fillRect(t.x*CELL_SIZE, t.y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        });
+        aiPlayers.forEach(ai => {
+            if (!ai.alive) return;
+            ctx.fillStyle = ai.color;
+            ctx.fillRect(ai.x*CELL_SIZE, ai.y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        });
+        if (alive1) { ctx.fillStyle = '#f44336'; ctx.fillRect(x1*CELL_SIZE,y1*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+        if (alive2) { ctx.fillStyle = '#1565c0'; ctx.fillRect(x2*CELL_SIZE,y2*CELL_SIZE,CELL_SIZE,CELL_SIZE);}
+        document.getElementById('paperio-score').innerText = `Red: ${score1} | Blue: ${score2}`;
+    }
+    function movePlayer1(dx, dy) {
+        if (!alive1) return;
+        let nx = (x1 + dx + GRID_SIZE) % GRID_SIZE;
+        let ny = (y1 + dy + GRID_SIZE) % GRID_SIZE;
+        if (trail1.some(t => t.x === nx && t.y === ny) ||
+            trail2.some(t => t.x === nx && t.y === ny) ||
+            aiPlayers.some(ai => ai.alive && ai.trail.some(t => t.x === nx && t.y === ny)) ||
+            aiPlayers.some(ai => ai.alive && ai.x === nx && ai.y === ny) ||
+            (alive2 && x2 === nx && y2 === ny)) {
+            alive1 = false;
+            standings.push({name: "Red", score: score1, color: "#f44336"});
+            checkGameOver();
+            return;
+        }
+        trail1.push({x: x1, y: y1});
+        x1 = nx; y1 = ny;
+        if (grid[y1][x1] === 0) score1++;
+        grid[y1][x1] = 1;
+        draw();
+    }
+    function movePlayer2(dx, dy) {
+        if (!alive2) return;
+        let nx = (x2 + dx + GRID_SIZE) % GRID_SIZE;
+        let ny = (y2 + dy + GRID_SIZE) % GRID_SIZE;
+        if (trail2.some(t => t.x === nx && t.y === ny) ||
+            trail1.some(t => t.x === nx && t.y === ny) ||
+            aiPlayers.some(ai => ai.alive && ai.trail.some(t => t.x === nx && t.y === ny)) ||
+            aiPlayers.some(ai => ai.alive && ai.x === nx && ai.y === ny) ||
+            (alive1 && x1 === nx && y1 === ny)) {
+            alive2 = false;
+            standings.push({name: "Blue", score: score2, color: "#1565c0"});
+            checkGameOver();
+            return;
+        }
+        trail2.push({x: x2, y: y2});
+        x2 = nx; y2 = ny;
+        if (grid[y2][x2] === 0) score2++;
+        grid[y2][x2] = 2;
+        draw();
+    }
+    document.onkeydown = function(e) {
+        if (currentGame !== paperioDemo) return;
+        if (alive1) {
+            if (e.key === 'ArrowUp') movePlayer1(0, -1);
+            if (e.key === 'ArrowDown') movePlayer1(0, 1);
+            if (e.key === 'ArrowLeft') movePlayer1(-1, 0);
+            if (e.key === 'ArrowRight') movePlayer1(1, 0);
+        }
+        if (alive2) {
+            if (e.key === 'w' || e.key === 'W') movePlayer2(0, -1);
+            if (e.key === 's' || e.key === 'S') movePlayer2(0, 1);
+            if (e.key === 'a' || e.key === 'A') movePlayer2(-1, 0);
+            if (e.key === 'd' || e.key === 'D') movePlayer2(1, 0);
+        }
+    };
+    function moveAI() {
+        aiPlayers.forEach((ai, idx) => {
+            if (!ai.alive) return;
+            let move = ai.pattern[ai.step % ai.pattern.length];
+            ai.step++;
+            let dx = 0, dy = 0;
+            if (move === 'up') dy = -1;
+            if (move === 'down') dy = 1;
+            if (move === 'left') dx = -1;
+            if (move === 'right') dx = 1;
+            let nx = (ai.x + dx + GRID_SIZE) % GRID_SIZE;
+            let ny = (ai.y + dy + GRID_SIZE) % GRID_SIZE;
+            if (ai.trail.some(t => t.x === nx && t.y === ny)) {
+                ai.alive = false;
+                ai.deathOrder = standings.length + 1;
+                ai.score = ai.trail.length;
+                standings.push({name: ai.name, score: ai.trail.length, color: ai.color});
+                checkGameOver();
+                return;
+            }
+            for (let j = 0; j < aiPlayers.length; j++) {
+                if (j === idx) continue;
+                let other = aiPlayers[j];
+                if (!other.alive) continue;
+                if (other.trail.some(t => t.x === nx && t.y === ny) || (other.x === nx && other.y === ny)) {
+                    ai.alive = false;
+                    ai.deathOrder = standings.length + 1;
+                    ai.score = ai.trail.length;
+                    standings.push({name: ai.name, score: ai.trail.length, color: ai.color});
+                    checkGameOver();
+                    return;
                 }
             }
-            function draw() {
-                ctx.clearRect(0,0,300,300);
-                for (let i=0;i<30;i++) for (let j=0;j<30;j++) {
-                    if (grid[i][j]) {
-                        ctx.fillStyle = '#4caf50';
-                        ctx.fillRect(j*10,i*10,10,10);
-                    }
+            if (trail1.some(t => t.x === nx && t.y === ny) ||
+                trail2.some(t => t.x === nx && t.y === ny) ||
+                (alive1 && x1 === nx && y1 === ny) ||
+                (alive2 && x2 === nx && y2 === ny)) {
+                ai.alive = false;
+                ai.deathOrder = standings.length + 1;
+                ai.score = ai.trail.length;
+                standings.push({name: ai.name, score: ai.trail.length, color: ai.color});
+                checkGameOver();
+                return;
+            }
+            ai.trail.push({x: ai.x, y: ai.y});
+            ai.x = nx; ai.y = ny;
+            if (grid[ai.y][ai.x] === 0) grid[ai.y][ai.x] = ai.fill;
+        });
+    }
+    function checkGameOver() {
+        let deadCount = standings.length;
+        let total = 2 + aiPlayers.length;
+        if (!finished && deadCount === total - 1) {
+            finished = true;
+            let survivors = [];
+            if (alive1) survivors.push({name: "Red", score: score1, color: "#f44336"});
+            if (alive2) survivors.push({name: "Blue", score: score2, color: "#1565c0"});
+            aiPlayers.forEach(ai => {
+                if (ai.alive) survivors.push({name: ai.name, score: ai.trail.length, color: ai.color});
+            });
+            standings.unshift(survivors[0]);
+            showStandings();
+        }
+        if (!alive1 && !alive2) {
+            document.getElementById('paperio-status').innerText = 'Both players lost!';
+        } else if (!alive1) {
+            document.getElementById('paperio-status').innerText = 'Red lost!';
+        } else if (!alive2) {
+            document.getElementById('paperio-status').innerText = 'Blue lost!';
+        }
+    }
+    function showStandings() {
+        let html = `<table class="standings"><tr><th>Place</th><th>Name</th><th>Score</th></tr>`;
+        standings.forEach((entry, idx) => {
+            html += `<tr>
+                <td>${idx+1}</td>
+                <td style="color:${entry.color};font-weight:bold">${entry.name}</td>
+                <td>${entry.score}</td>
+            </tr>`;
+        });
+        html += `</table>`;
+        document.getElementById('paperio-standings').innerHTML = html;
+    }
+    let running = true;
+    function gameLoop() {
+        if (!running) return;
+        moveAI();
+        draw();
+        currentGame = paperioDemo;
+        setTimeout(gameLoop, 120);
+    }
+    draw();
+    running = true;
+    currentGame = paperioDemo;
+    gameLoop();
+    paperioDemo.stop = () => { running = false; };
+}
+
+// --- Hangman ---
+function hangmanGame() {
+    document.getElementById('game-area').innerHTML = `
+        <h2 style="text-align:center;">Hangman</h2>
+        <canvas id="hangman-canvas" width="300" height="220" style="display:block;margin:0 auto 10px auto;background:#fff;"></canvas>
+        <div id="hangman-word"></div>
+        <div id="hangman-letters"></div>
+        <div id="hangman-status"></div>
+        <div style="text-align:center;"><button onclick="hangmanGame()">Restart</button></div>
+    `;
+    const WORDS = ["javascript","python","hangman","computer","programming","algorithm","variable","function","object","array"];
+    let word = WORDS[Math.floor(Math.random()*WORDS.length)];
+    let guessed = [];
+    let wrong = 0, maxWrong = 6;
+    function drawLavaMan() {
+        const c = document.getElementById('hangman-canvas');
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0,0,300,220);
+        ctx.fillStyle = "#ff5722";
+        ctx.fillRect(0, 200, 300, 20);
+        ctx.fillStyle = "#d84315";
+        for(let i=0;i<15;i++) {
+            ctx.beginPath();
+            ctx.arc(10+i*20, 210, 10, 0, Math.PI, true);
+            ctx.fill();
+        }
+        let minY = 40, maxY = 140;
+        let baseY = minY + (maxY-minY)*(wrong/maxWrong);
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(150, 10);
+        ctx.lineTo(150, baseY-20);
+        ctx.stroke();
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(150, baseY, 15, 0, 2*Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(150, baseY+15);
+        ctx.lineTo(150, baseY+55);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(150, baseY+25);
+        ctx.lineTo(120, baseY+35);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(150, baseY+25);
+        ctx.lineTo(180, baseY+35);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(150, baseY+55);
+        ctx.lineTo(130, baseY+90);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(150, baseY+55);
+        ctx.lineTo(170, baseY+90);
+        ctx.stroke();
+        if (wrong >= maxWrong) {
+            ctx.fillStyle = "#f44336";
+            ctx.beginPath();
+            ctx.arc(150, baseY, 15, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(143, baseY-5); ctx.lineTo(147, baseY-1);
+            ctx.moveTo(157, baseY-5); ctx.lineTo(153, baseY-1);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(150, baseY+7, 6, 0, Math.PI, false);
+            ctx.stroke();
+        }
+    }
+    function drawWord() {
+        let display = "";
+        for (let ch of word) display += guessed.includes(ch) ? ch + " " : "_ ";
+        document.getElementById('hangman-word').textContent = display.trim();
+    }
+    function drawLetters() {
+        let html = "";
+        for (let i=65; i<=90; i++) {
+            let ch = String.fromCharCode(i).toLowerCase();
+            html += `<button ${guessed.includes(ch)||wrong>=maxWrong||isWin()?'disabled':''} onclick="guess('${ch}')">${ch}</button>`;
+            if ((i-64)%7===0) html += "<br>";
+        }
+        document.getElementById('hangman-letters').innerHTML = html;
+    }
+    function guess(ch) {
+        if (guessed.includes(ch) || wrong>=maxWrong) return;
+        guessed.push(ch);
+        if (!word.includes(ch)) wrong++;
+        drawWord();
+        drawLetters();
+        drawLavaMan();
+        if (isWin()) {
+            document.getElementById('hangman-status').textContent = "You win! The word was: " + word;
+        } else if (wrong >= maxWrong) {
+            document.getElementById('hangman-status').textContent = "Game over! The word was: " + word;
+        }
+    }
+    function isWin() {
+        return word.split('').every(ch => guessed.includes(ch));
+    }
+    window.guess = guess;
+    drawWord();
+    drawLetters();
+    drawLavaMan();
+    currentGame = hangmanGame;
+    hangmanGame.stop = () => {};
+}
+
+// --- Rock Paper Scissors ---
+function rpsGame() {
+    document.getElementById('game-area').innerHTML = `
+        <h2 style="text-align:center;">Rock Paper Scissors</h2>
+        <div id="rps-choices" style="text-align:center;">
+            <button onclick="playRPS('rock')">Rock</button>
+            <button onclick="playRPS('paper')">Paper</button>
+            <button onclick="playRPS('scissors')">Scissors</button>
+        </div>
+        <div id="rps-result"></div>
+    `;
+    window.playRPS = function(player) {
+        const choices = ["rock", "paper", "scissors"];
+        const computer = choices[Math.floor(Math.random()*3)];
+        let result = "";
+        if (player === computer) result = "It's a tie!";
+        else if (
+            (player === "rock" && computer === "scissors") ||
+            (player === "paper" && computer === "rock") ||
+            (player === "scissors" && computer === "paper")
+        ) result = "You win!";
+        else result = "You lose!";
+        document.getElementById('rps-result').innerHTML =
+            `You chose <b>${player}</b>.<br>Computer chose <b>${computer}</b>.<br><b>${result}</b>`;
+    };
+    currentGame = rpsGame;
+    rpsGame.stop = () => {};
+}
+
+// --- 4 in a Row (Connect Four) ---
+function connect4Game() {
+    document.getElementById('game-area').innerHTML = `
+        <h2 style="text-align:center;">4 in a Row</h2>
+        <canvas id="connect4-board" width="420" height="360"></canvas>
+        <div id="connect4-status"></div>
+        <button id="connect4-restart" onclick="connect4Game()">Restart</button>
+    `;
+    const COLS = 7, ROWS = 6;
+    let board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    let currentPlayer = 1;
+    let gameOver = false;
+    function drawBoard() {
+        const c = document.getElementById('connect4-board');
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0,0,420,360);
+        ctx.fillStyle = "#1976d2";
+        ctx.fillRect(0,0,420,360);
+        for(let r=0;r<ROWS;r++) for(let c2=0;c2<COLS;c2++) {
+            ctx.beginPath();
+            ctx.arc(30+c2*60, 30+r*60, 25, 0, 2*Math.PI);
+            ctx.fillStyle = board[r][c2]===1 ? "#f44336" : board[r][c2]===2 ? "#ffeb3b" : "#fff";
+            ctx.fill();
+            ctx.strokeStyle = "#888";
+            ctx.stroke();
+        }
+    }
+    function checkWin(player) {
+        for(let r=0;r<ROWS;r++) for(let c=0;c<COLS-3;c++)
+            if([0,1,2,3].every(i=>board[r][c+i]===player)) return true;
+        for(let c=0;c<COLS;c++) for(let r=0;r<ROWS-3;r++)
+            if([0,1,2,3].every(i=>board[r+i][c]===player)) return true;
+        for(let r=0;r<ROWS-3;r++) for(let c=0;c<COLS-3;c++)
+            if([0,1,2,3].every(i=>board[r+i][c+i]===player)) return true;
+        for(let r=3;r<ROWS;r++) for(let c=0;c<COLS-3;c++)
+            if([0,1,2,3].every(i=>board[r-i][c+i]===player)) return true;
+        return false;
+    }
+    function checkDraw() {
+        return board.every(row => row.every(cell => cell!==0));
+    }
+    function handleClick(evt) {
+        if (gameOver) return;
+        const rect = evt.target.getBoundingClientRect();
+        const x = evt.clientX - rect.left;
+        const col = Math.floor(x/60);
+        if (col<0||col>=COLS) return;
+        for(let r=ROWS-1;r>=0;r--) {
+            if (board[r][col]===0) {
+                board[r][col]=currentPlayer;
+                if (checkWin(currentPlayer)) {
+                    drawBoard();
+                    document.getElementById('connect4-status').textContent = (currentPlayer===1?"Red":"Yellow")+" wins!";
+                    gameOver = true;
+                    return;
+                } else if (checkDraw()) {
+                    drawBoard();
+                    document.getElementById('connect4-status').textContent = "It's a draw!";
+                    gameOver = true;
+                    return;
                 }
-                ctx.fillStyle = '#f44336';
-                ctx.fillRect(x*10,y*10,10,10);
-                document.getElementById('paperio-score').innerText = `Score: ${score}`;
+                currentPlayer = 3-currentPlayer;
+                drawBoard();
+                document.getElementById('connect4-status').textContent = (currentPlayer===1?"Red":"Yellow")+"'s turn";
+                return;
             }
         }
-    </script>
+    }
+    document.getElementById('connect4-board').addEventListener('click', handleClick);
+    drawBoard();
+    document.getElementById('connect4-status').textContent = "Red's turn";
+    currentGame = connect4Game;
+    connect4Game.stop = () => {};
+}
+
+// --- Space Invaders ---
+function spaceInvadersGame() {
+    document.getElementById('game-area').innerHTML = `
+        <h2 style="text-align:center;">Space Invaders</h2>
+        <canvas id="spaceinvaders-canvas" width="400" height="500" style="background:#111;display:block;margin:0 auto;"></canvas>
+        <div id="spaceinvaders-status"></div>
+        <div style="text-align:center;"><button onclick="spaceInvadersGame()">Restart</button></div>
+    `;
+    const canvas = document.getElementById('spaceinvaders-canvas');
+    const ctx = canvas.getContext('2d');
+    let left = false, right = false, space = false;
+    let player = {x: 200, y: 470, w: 40, h: 10, lives: 2};
+    let bullets = [];
+    let alienBullets = [];
+    let aliens = [];
+    let alienDir = 1;
+    let alienSpeed = 20;
+    let frames = 0;
+    let gameOver = false;
+    let win = false;
+    let score = 0;
+    let barriers = [
+        {x: 70, y: 400, w: 40, h: 20, hp: 20},
+        {x: 180, y: 400, w: 40, h: 20, hp: 20},
+        {x: 290, y: 400, w: 40, h: 20, hp: 20}
+    ];
+    let shooterAliens = [];
+
+    function resetAliens() {
+        aliens = [];
+        shooterAliens = [];
+        for(let r=0;r<4;r++) for(let c=0;c<8;c++) {
+            let alien = {x: 40+c*40, y: 40+r*35, w: 30, h: 20, alive: true, shooter: false};
+            aliens.push(alien);
+        }
+        let bottomAliens = aliens.filter(a => a.y === 40+3*35);
+        for (let a of bottomAliens) {
+            a.shooter = true;
+            shooterAliens.push(a);
+        }
+    }
+    resetAliens();
+
+    function drawPlayer() {
+        ctx.save();
+        ctx.translate(player.x, player.y+player.h/2);
+        ctx.beginPath();
+        ctx.moveTo(0, -20);
+        ctx.lineTo(-player.w/2, 15);
+        ctx.lineTo(player.w/2, 15);
+        ctx.closePath();
+        ctx.fillStyle = "#00e5ff";
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function draw() {
+        ctx.clearRect(0,0,400,500);
+        for (let b of barriers) {
+            if (b.hp > 0) {
+                ctx.fillStyle = "#8d6e63";
+                ctx.fillRect(b.x, b.y, b.w, b.h);
+                ctx.fillStyle = "#fff";
+                ctx.font = "10px Arial";
+                ctx.fillText(b.hp, b.x+b.w/2-8, b.y+b.h/2+4);
+            }
+        }
+        drawPlayer();
+        ctx.fillStyle = "#fff";
+        for (let b of bullets) ctx.fillRect(b.x-2, b.y, 4, 10);
+        ctx.fillStyle = "#ff1744";
+        for (let b of alienBullets) ctx.fillRect(b.x-2, b.y, 4, 10);
+        for (let a of aliens) {
+            if (!a.alive) continue;
+            ctx.fillStyle = a.shooter ? "#ff9100" : "#ffeb3b";
+            ctx.fillRect(a.x, a.y, a.w, a.h);
+            ctx.strokeStyle = "#888";
+            ctx.strokeRect(a.x, a.y, a.w, a.h);
+            if (a.shooter) {
+                ctx.beginPath();
+                ctx.moveTo(a.x+a.w/2, a.y+a.h);
+                ctx.lineTo(a.x+a.w/2-6, a.y+a.h+10);
+                ctx.lineTo(a.x+a.w/2+6, a.y+a.h+10);
+                ctx.closePath();
+                ctx.fillStyle = "#ff9100";
+                ctx.fill();
+            }
+        }
+        ctx.fillStyle = "#fff";
+        ctx.font = "18px Arial";
+        ctx.fillText("Score: " + score, 10, 20);
+        ctx.fillText("Lives: " + player.lives, 320, 20);
+    }
+
+    function update() {
+        if (gameOver) return;
+        if (left && player.x-player.w/2>0) player.x -= 6;
+        if (right && player.x+player.w/2<400) player.x += 6;
+        for (let b of bullets) b.y -= 8;
+        bullets = bullets.filter(b => b.y > 0);
+        for (let b of alienBullets) b.y += 7;
+        alienBullets = alienBullets.filter(b => b.y < 500);
+        frames++;
+        if (frames % 15 === 0) {
+            let edge = false;
+            for (let a of aliens) {
+                if (!a.alive) continue;
+                a.x += alienDir * alienSpeed;
+                if (a.x < 0 || a.x + a.w > 400) edge = true;
+            }
+            if (edge) {
+                alienDir *= -1;
+                for (let a of aliens) if (a.alive) a.y += 20;
+            }
+        }
+        if (frames % Math.round(30*1.75) === 0) {
+            for (let a of shooterAliens) {
+                if (!a.alive) continue;
+                alienBullets.push({x: a.x+a.w/2, y: a.y+a.h});
+            }
+        }
+        for (let b of bullets) {
+            for (let a of aliens) {
+                if (!a.alive) continue;
+                if (b.x > a.x && b.x < a.x+a.w && b.y < a.y+a.h && b.y > a.y) {
+                    a.alive = false;
+                    b.y = -10;
+                    if (a.shooter) score += 50;
+                    else score += 10;
+                }
+            }
+        }
+        for (let b of bullets) {
+            for (let barrier of barriers) {
+                if (barrier.hp > 0 && b.x > barrier.x && b.x < barrier.x+barrier.w && b.y < barrier.y+barrier.h && b.y > barrier.y) {
+                    barrier.hp--;
+                    b.y = -10;
+                }
+            }
+        }
+        for (let b of alienBullets) {
+            for (let barrier of barriers) {
+                if (barrier.hp > 0 && b.x > barrier.x && b.x < barrier.x+barrier.w && b.y < barrier.y+barrier.h && b.y > barrier.y) {
+                    barrier.hp--;
+                    b.y = 600;
+                }
+            }
+        }
+        for (let b of alienBullets) {
+            if (b.x > player.x-player.w/2 && b.x < player.x+player.w/2 && b.y > player.y-20 && b.y < player.y+15) {
+                b.y = 600;
+                player.lives--;
+                if (player.lives <= 0) {
+                    gameOver = true;
+                    win = false;
+                }
+            }
+        }
+        for (let a of aliens) {
+            if (!a.alive) continue;
+            if (a.y + a.h >= player.y-10 && a.x < player.x+player.w/2 && a.x+a.w > player.x-player.w/2) {
+                player.lives = 0;
+                gameOver = true;
+                win = false;
+            }
+            if (a.y + a.h >= 490) {
+                player.lives = 0;
+                gameOver = true;
+                win = false;
+            }
+        }
+        if (aliens.every(a=>!a.alive)) {
+            gameOver = true;
+            win = true;
+        }
+    }
+
+    function loop() {
+        draw();
+        update();
+        if (gameOver) {
+            document.getElementById('spaceinvaders-status').textContent = win ? "You win! Score: "+score : "Game Over! Score: "+score;
+            return;
+        } else {
+            document.getElementById('spaceinvaders-status').textContent = "";
+        }
+        requestAnimationFrame(loop);
+    }
+
+    function shoot() {
+        if (bullets.length < 3) {
+            bullets.push({x: player.x, y: player.y-20});
+        }
+    }
+
+    function keydown(e) {
+        if (e.key === "ArrowLeft") left = true;
+        if (e.key === "ArrowRight") right = true;
+        if (e.key === " " || e.key === "Spacebar") space = true;
+    }
+    function keyup(e) {
+        if (e.key === "ArrowLeft") left = false;
+        if (e.key === "ArrowRight") right = false;
+        if (e.key === " " || e.key === "Spacebar") space = false;
+    }
+    document.addEventListener('keydown', keydown);
+    document.addEventListener('keyup', keyup);
+
+    let shootInterval = setInterval(() => { if (space && !gameOver) shoot(); }, 120);
+
+    loop();
+
+    currentGame = spaceInvadersGame;
+    spaceInvadersGame.stop = () => {
+        document.removeEventListener('keydown', keydown);
+        document.removeEventListener('keyup', keyup);
+        clearInterval(shootInterval);
+    };
+}
+
+showHome();
+</script>
 </body>
 </html>
