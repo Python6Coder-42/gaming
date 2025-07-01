@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Games Hub</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #222; color: #fff; text-align: center; }
+        h1 { margin-top: 30px; }
+        .game-list { margin: 30px 0; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+        #game-area { margin-top: 30px; }
+        .hidden { display: none; }
+        .hangman-word { letter-spacing: 10px; font-size: 24px; }
+        .hangman-letters button { margin: 2px; }
+    </style>
+</head>
+<body>
+    <h1>Mini Games Hub</h1>
+    <div class="game-list">
+        <button onclick="showGame('rps')">Rock Paper Scissors</button>
+        <button onclick="showGame('hangman')">Hangman</button>
+        <button onclick="showGame('paperio')">Paper.io (Demo)</button>
+    </div>
+    <div id="game-area"></div>
+
+    <script>
+        function showGame(game) {
+            document.getElementById('game-area').innerHTML = '';
+            if (game === 'rps') rockPaperScissors();
+            if (game === 'hangman') hangman();
+            if (game === 'paperio') paperioDemo();
+        }
+
+        // Rock Paper Scissors
+        function rockPaperScissors() {
+            const area = document.getElementById('game-area');
+            area.innerHTML = `
+                <h2>Rock Paper Scissors</h2>
+                <div>
+                    <button onclick="rpsPlay('Rock')">Rock</button>
+                    <button onclick="rpsPlay('Paper')">Paper</button>
+                    <button onclick="rpsPlay('Scissors')">Scissors</button>
+                </div>
+                <div id="rps-result" style="margin-top:20px;font-size:18px;"></div>
+            `;
+            window.rpsPlay = function(player) {
+                const choices = ['Rock', 'Paper', 'Scissors'];
+                const ai = choices[Math.floor(Math.random() * 3)];
+                let result = '';
+                if (player === ai) result = "It's a draw!";
+                else if (
+                    (player === 'Rock' && ai === 'Scissors') ||
+                    (player === 'Paper' && ai === 'Rock') ||
+                    (player === 'Scissors' && ai === 'Paper')
+                ) result = 'You win!';
+                else result = 'You lose!';
+                document.getElementById('rps-result').innerText =
+                    `You: ${player} | AI: ${ai}\n${result}`;
+            }
+        }
+
+        // Hangman
+        function hangman() {
+            const words = ['javascript', 'hangman', 'computer', 'program', 'github'];
+            const word = words[Math.floor(Math.random() * words.length)];
+            let guessed = [];
+            let wrong = 0;
+            const maxWrong = 6;
+
+            function render() {
+                const area = document.getElementById('game-area');
+                let displayWord = word.split('').map(l => guessed.includes(l) ? l : '_').join(' ');
+                let letters = '';
+                for (let c = 97; c <= 122; c++) {
+                    const letter = String.fromCharCode(c);
+                    letters += `<button ${guessed.includes(letter) ? 'disabled' : ''} onclick="guess('${letter}')">${letter}</button>`;
+                }
+                area.innerHTML = `
+                    <h2>Hangman</h2>
+                    <div>Wrong guesses: ${wrong} / ${maxWrong}</div>
+                    <div class="hangman-word">${displayWord}</div>
+                    <div class="hangman-letters">${letters}</div>
+                    <div id="hangman-result" style="margin-top:20px;font-size:18px;"></div>
+                `;
+                if (!displayWord.includes('_')) {
+                    document.getElementById('hangman-result').innerText = 'You win!';
+                    disableAll();
+                } else if (wrong >= maxWrong) {
+                    document.getElementById('hangman-result').innerText = `You lose! Word was: ${word}`;
+                    disableAll();
+                }
+            }
+            window.guess = function(letter) {
+                if (!guessed.includes(letter)) {
+                    guessed.push(letter);
+                    if (!word.includes(letter)) wrong++;
+                }
+                render();
+            }
+            function disableAll() {
+                document.querySelectorAll('.hangman-letters button').forEach(btn => btn.disabled = true);
+            }
+            render();
+        }
+
+        // Paper.io Demo (very simple)
+        function paperioDemo() {
+            const area = document.getElementById('game-area');
+            area.innerHTML = `
+                <h2>Paper.io (Demo)</h2>
+                <canvas id="paperio-canvas" width="300" height="300" style="background:#eee;border:1px solid #888;"></canvas>
+                <div>Use arrow keys to move. Fill as much area as you can!</div>
+                <div id="paperio-score" style="margin-top:10px;"></div>
+            `;
+            const canvas = document.getElementById('paperio-canvas');
+            const ctx = canvas.getContext('2d');
+            let grid = Array.from({length: 30}, () => Array(30).fill(0));
+            let x = 15, y = 15, score = 0;
+            grid[y][x] = 1;
+            draw();
+            document.onkeydown = function(e) {
+                let nx = x, ny = y;
+                if (e.key === 'ArrowUp') ny--;
+                if (e.key === 'ArrowDown') ny++;
+                if (e.key === 'ArrowLeft') nx--;
+                if (e.key === 'ArrowRight') nx++;
+                if (nx >= 0 && nx < 30 && ny >= 0 && ny < 30) {
+                    x = nx; y = ny;
+                    if (grid[y][x] === 0) score++;
+                    grid[y][x] = 1;
+                    draw();
+                }
+            }
+            function draw() {
+                ctx.clearRect(0,0,300,300);
+                for (let i=0;i<30;i++) for (let j=0;j<30;j++) {
+                    if (grid[i][j]) {
+                        ctx.fillStyle = '#4caf50';
+                        ctx.fillRect(j*10,i*10,10,10);
+                    }
+                }
+                ctx.fillStyle = '#f44336';
+                ctx.fillRect(x*10,y*10,10,10);
+                document.getElementById('paperio-score').innerText = `Score: ${score}`;
+            }
+        }
+    </script>
+</body>
+</html>
